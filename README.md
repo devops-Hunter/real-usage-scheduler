@@ -298,9 +298,9 @@ kubectl get pods
 ### 源码编译
 
 > warning
-> - 一定要在liunx上编译。会调用一部分C库，本机上会出现很多奇怪的报错
+> - 一定要在linux上编译。会调用一部分C库，本机上会出现很多奇怪的报错
 
-1. clone源码
+1. clone源码 `git clone https://github.com/devops-Hunter/real-usage-scheduler.git`
 2. 编译
 ```shell
 go env -w GO111MODULE=on && export GOPROXY=https://goproxy.cn,direct&& hack/update-codegen.sh
