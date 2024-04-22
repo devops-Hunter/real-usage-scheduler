@@ -30,6 +30,8 @@ groups:
 	- record: node_mem_usage_avg_5m
 	  expr: avg_over_time( ((1- (node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes)  / node_memory_MemTotal_bytes ) * 100 )[5m:1m])
 ```
+<img width="1519" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/2700612c-7d66-45da-a754-b65abc19d974">
+
 
 
 #### 创建配置文件
@@ -232,8 +234,9 @@ spec:
 
 
 - 先看看默认的调度情况
+<img width="1137" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/f0f1575a-67f0-4631-b376-2d4d05ea377a">
 
-![[Pasted image 20240422160853.png|600]]
+
 - 我们来压测一下内存
 ```go
 package main
@@ -265,31 +268,35 @@ func main() {
 
 - 在k8s-node-02上执行`go run main.go`观察一下prometheus监控曲线
 
-![[Pasted image 20240422162218.png|600]]
+<img width="1037" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/187c17b7-3222-4bf2-aaca-724a5091323c">
+
 - 看下此时k8s-node-02的request
-![[Pasted image 20240422162858.png|600]]
+<img width="1264" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/cee44455-017d-4dca-affd-d2c7f786b8af">
+
 - 此时再重启一下deployment看下调度情况
 ```shell
 kubectl rollout restart deployment/nginx-mem-scheduler
 kubectl get pods
 ```
-![[Pasted image 20240422162449.png|600]]
+<img width="1196" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/0487f69a-a8f2-4197-a2b0-7c2f68e56c85">
+
 - 日志
-![[Pasted image 20240422162530.png|600]]
+<img width="611" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/cf7b260d-5d22-4b34-84d2-2ad4eade6497">
 
 
-> [!check] 结论
+
+>  结论
 > - 可以看到k8s-node-02上的request还相当充裕,此时的原始score达到了33分(其余节点分别为13,13)
 > - 但是经过我们的调度器追加评分后，由于内存过高，直接从33分-->0分。可以看到后续pod对象绑定的节点都排除了k8s-node-02
 
-> [!todo] TODO
+>  TODO
 > - 后续可以尝试一下节点资源超卖类型的调度器
 > 	- 比如原先节点的内存request负载是80%，但是由于真实负载很低。我让它变成50%。这样score评分就变相提高了。可以让更多pod优先调度
 
 
 ### 源码编译
 
-> [!warning] warning
+> warning
 > - 一定要在liunx上编译。会调用一部分C库，本机上会出现很多奇怪的报错
 
 1. clone源码
