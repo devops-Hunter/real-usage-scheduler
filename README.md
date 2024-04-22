@@ -4,7 +4,7 @@
 
 ### 在K8S上一把梭
 
-> [!summary] list
+> list
 > - 一个K8S集群
 > 	- 1.24以上，低于这个版本没测过
 > - prometheus
