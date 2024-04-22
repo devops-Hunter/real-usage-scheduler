@@ -14,6 +14,24 @@
 > 	- master节点有/etc/kubernetes/scheduler.conf
 > 	- 公有云托管版的话自己生成一个config
 
+#### 首先配置一下prometheus
+
+- 每台节点上加一个node的标签区分节点。这里就不赘述怎么做了
+
+<img width="1488" alt="image" src="https://github.com/devops-Hunter/real-usage-scheduler/assets/59683023/f38ea5f9-0198-4a7b-b771-5f7c9281ae81">
+
+- 加一个聚合查询负载情况，先算顺时值，然后横向聚合一下
+```yaml
+groups:
+  - name: for-usage-scheduler
+	rules:
+	- record: node_cpu_usage_avg_5m
+	  expr: avg_over_time((avg(rate(node_cpu_seconds_total{mode ="user"}[1m])) by (instance) * 100) [5m:1m])
+	- record: node_mem_usage_avg_5m
+	  expr: avg_over_time( ((1- (node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes)  / node_memory_MemTotal_bytes ) * 100 )[5m:1m])
+```
+
+
 #### 创建配置文件
 
 > 实际上就是一个载体用来存kubeconfig和scheduling crd配置文件。这里我们用secret
